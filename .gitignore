@@ -1,0 +1,13 @@
+# Ignore all
+*
+# Unignore files with extensions
+!*.*
+# Unignore dirs
+!*/
+
+# Ignore VSCode config
+.vscode
+
+# Ignore generated protobuf files
+*.pb.cc
+*.pb.h
