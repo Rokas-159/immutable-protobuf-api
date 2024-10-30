@@ -104,7 +104,6 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  tutorial::AddressBook address_book;
   vector<tutorial::AddressBook> messages;
   size_t message_index;
 
