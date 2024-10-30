@@ -9,10 +9,10 @@ void ListPeople(const tutorial::AddressBook& address_book) {
   for (int i = 0; i < address_book.people_size(); i++) {
     const tutorial::Person& person = address_book.people(i);
 
-    cout << "Person ID: " << person.id() << endl;
-    cout << "  Name: " << person.name() << endl;
+    cout << "  Person ID: " << person.id() << endl;
+    cout << "    Name: " << person.name() << endl;
     if (person.has_email()) {
-      cout << "  E-mail address: " << person.email() << endl;
+      cout << "    E-mail address: " << person.email() << endl;
     }
 
     for (int j = 0; j < person.phones_size(); j++) {
@@ -20,18 +20,43 @@ void ListPeople(const tutorial::AddressBook& address_book) {
 
       switch (phone_number.type()) {
         case tutorial::Person::PHONE_TYPE_MOBILE:
-          cout << "  Mobile phone #: ";
+          cout << "    Mobile phone #: ";
           break;
         case tutorial::Person::PHONE_TYPE_HOME:
-          cout << "  Home phone #: ";
+          cout << "    Home phone #: ";
           break;
         case tutorial::Person::PHONE_TYPE_WORK:
-          cout << "  Work phone #: ";
+          cout << "    Work phone #: ";
           break;
       }
       cout << phone_number.number() << endl;
     }
   }
+}
+
+bool ParseDelimitedMessage(tutorial::AddressBook& message, istream& input) {
+  uint32_t size;
+  if (!input.read(reinterpret_cast<char*>(&size), sizeof(size))) {
+    return false;
+  }
+
+  string buffer(size, '\0');
+  if (!input.read(&buffer[0], size)) {
+    return false;
+  }
+
+  return message.ParseFromString(buffer);
+}
+
+vector<tutorial::AddressBook> ParseMultipleDelimitedMessages(istream& input) {
+  vector<tutorial::AddressBook> messages;
+  tutorial::AddressBook message;
+
+  while (ParseDelimitedMessage(message, input)) {
+    messages.push_back(message);
+  }
+
+  return messages;
 }
 
 // Main function:  Reads the entire address book from a file and prints all
@@ -46,18 +71,19 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  tutorial::AddressBook address_book;
+  vector<tutorial::AddressBook> messages;
 
   {
     // Read the existing address book.
     fstream input(argv[1], ios::in | ios::binary);
-    if (!address_book.ParseFromIstream(&input)) {
-      cerr << "Failed to parse address book." << endl;
-      return -1;
-    }
+
+    messages = ParseMultipleDelimitedMessages(input);
   }
 
-  ListPeople(address_book);
+  for (size_t i = 0; i < messages.size(); i++) {
+    cout << "Message " << i << ":" << endl;
+    ListPeople(messages[i]);
+  }  
 
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
