@@ -92,4 +92,4 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
-// g++ writer.cpp addressbook.pb.cc -o main -lprotobuf
+// g++ writer.cpp addressbook.pb.cc -o writer -lprotobuf

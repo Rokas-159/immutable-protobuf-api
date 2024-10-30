@@ -65,4 +65,4 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
-// g++ main.cpp addressbook.pb.cc -o main -lprotobuf
+// g++ reader.cpp addressbook.pb.cc -o reader -lprotobuf
