@@ -48,15 +48,13 @@ bool ParseDelimitedMessage(tutorial::AddressBook& message, istream& input) {
   return message.ParseFromString(buffer);
 }
 
-vector<tutorial::AddressBook> ParseMultipleDelimitedMessages(istream& input) {
-  vector<tutorial::AddressBook> messages;
+void ParseMultipleDelimitedMessages(istream& input) {
   tutorial::AddressBook message;
 
-  while (ParseDelimitedMessage(message, input)) {
-    messages.push_back(message);
+  for (int i = 0; ParseDelimitedMessage(message, input); i++) {
+    cout << "Message " << i << ":" << endl;
+    ListPeople(message);
   }
-
-  return messages;
 }
 
 // Main function:  Reads the entire address book from a file and prints all
@@ -71,19 +69,12 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  vector<tutorial::AddressBook> messages;
-
   {
     // Read the existing address book.
     fstream input(argv[1], ios::in | ios::binary);
 
-    messages = ParseMultipleDelimitedMessages(input);
+    ParseMultipleDelimitedMessages(input);
   }
-
-  for (size_t i = 0; i < messages.size(); i++) {
-    cout << "Message " << i << ":" << endl;
-    ListPeople(messages[i]);
-  }  
 
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
