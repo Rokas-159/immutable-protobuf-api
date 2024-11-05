@@ -5,12 +5,11 @@ CXX = g++
 CXXFLAGS = -lprotobuf
 
 # Source files
-EXAMPLE_DIR = Example
-ADDRESSBOOK_SRC = $(EXAMPLE_DIR)/addressbook.proto
+ADDRESSBOOK_SRC = addressbook.proto
 
-PROTOBUF_SRC = $(EXAMPLE_DIR)/addressbook.pb.cc
-WRITER_SRC = $(EXAMPLE_DIR)/writer.cpp
-READER_SRC = $(EXAMPLE_DIR)/reader.cpp
+PROTOBUF_SRC = addressbook.pb.cc
+WRITER_SRC = writer.cpp
+READER_SRC = reader.cpp
 
 # Target files
 BIN_DIR = build
@@ -25,7 +24,7 @@ all: fullexample
 fullexample: addressbook example
 
 addressbook: $(ADDRESSBOOK_SRC)
-	protoc -I=$(EXAMPLE_DIR) --cpp_out=$(EXAMPLE_DIR) $(ADDRESSBOOK_SRC)
+	protoc -I=./ --cpp_out=./ $(ADDRESSBOOK_SRC)
 
 example: writer reader
 
