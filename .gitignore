@@ -11,6 +11,12 @@
 # Ignore VSCode config
 .vscode
 
+# Ignore build directory
+*/build
+
+# Ignore object files
+*.o
+
 # Ignore generated protobuf files
 *.pb.cc
 *.pb.h
