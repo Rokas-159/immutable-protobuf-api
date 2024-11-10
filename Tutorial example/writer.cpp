@@ -49,7 +49,7 @@ void PromptForAddress(tutorial::Person* person) {
 }
 
 bool ParseDelimitedMessage(tutorial::AddressBook& message, istream& input) {
-  uint32_t size;
+  uint64_t size;
   if (!input.read(reinterpret_cast<char*>(&size), sizeof(size))) {
     return false;
   }
@@ -79,7 +79,7 @@ bool WriteDelimitedMessage(const tutorial::AddressBook& message, ostream& output
     return false;
   }
 
-  uint32_t size = serialized.size();
+  uint64_t size = serialized.size();
   output.write(reinterpret_cast<const char*>(&size), sizeof(size));
   output.write(serialized.data(), serialized.size());
   return output.good();
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
   }
 
   vector<tutorial::AddressBook> messages;
-  size_t message_index;
+  uint64_t message_index;
 
   {
     // Read the existing address book.

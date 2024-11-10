@@ -35,12 +35,13 @@ void ListPeople(const tutorial::AddressBook& address_book) {
 }
 
 bool ParseDelimitedMessage(tutorial::AddressBook& message, istream& input) {
-  uint32_t size;
+  uint64_t size;
+  
   if (!input.read(reinterpret_cast<char*>(&size), sizeof(size))) {
     return false;
   }
 
-  string buffer(size, '\0');
+  char buffer[size];
   if (!input.read(&buffer[0], size)) {
     return false;
   }
