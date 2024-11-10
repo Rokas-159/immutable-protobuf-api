@@ -5,8 +5,17 @@
 # Unignore dirs
 !*/
 
+# Unignore makefile
+!makefile
+
 # Ignore VSCode config
 .vscode
+
+# Ignore build directory
+*/build
+
+# Ignore object files
+*.o
 
 # Ignore generated protobuf files
 *.pb.cc
