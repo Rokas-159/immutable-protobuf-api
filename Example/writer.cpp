@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include "addressbook.pb.h"
+#include "message_parser.h"
 using namespace std;
 
 // This function fills in a Person message based on user input.
@@ -46,20 +47,6 @@ void PromptForAddress(tutorial::Person* person) {
       cout << "Unknown phone type.  Using default." << endl;
     }
   }
-}
-
-bool ParseDelimitedMessage(tutorial::AddressBook& message, istream& input) {
-  uint64_t size;
-  if (!input.read(reinterpret_cast<char*>(&size), sizeof(size))) {
-    return false;
-  }
-
-  string buffer(size, '\0');
-  if (!input.read(&buffer[0], size)) {
-    return false;
-  }
-
-  return message.ParseFromString(buffer);
 }
 
 vector<tutorial::AddressBook> ParseMultipleDelimitedMessages(istream& input) {

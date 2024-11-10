@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include "addressbook.pb.h"
+#include "message_parser.h"
 using namespace std;
 
 // Iterates though all people in the AddressBook and prints info about them.
@@ -32,21 +33,6 @@ void ListPeople(const tutorial::AddressBook& address_book) {
       cout << phone_number.number() << endl;
     }
   }
-}
-
-bool ParseDelimitedMessage(tutorial::AddressBook& message, istream& input) {
-  uint64_t size;
-  
-  if (!input.read(reinterpret_cast<char*>(&size), sizeof(size))) {
-    return false;
-  }
-
-  char buffer[size];
-  if (!input.read(&buffer[0], size)) {
-    return false;
-  }
-
-  return message.ParseFromString(buffer);
 }
 
 void ParseMultipleDelimitedMessages(istream& input) {
