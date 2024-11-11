@@ -3,6 +3,7 @@
 #include <string>
 #include "addressbook.pb.h"
 #include "message_parser.h"
+
 using namespace std;
 
 // Iterates though all people in the AddressBook and prints info about them.
@@ -62,7 +63,6 @@ int main(int argc, char* argv[]) {
 
     ParseMultipleDelimitedMessages(input);
   }
-
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
 
