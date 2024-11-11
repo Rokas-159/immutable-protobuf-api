@@ -3,7 +3,8 @@
 #include <string>
 #include "addressbook.pb.h"
 
-bool ParseDelimitedMessage(tutorial::AddressBook& message, std::istream& input) {
+template <typename T>
+bool ParseDelimitedMessage(T& message, std::istream& input) {
   uint64_t size;
   
   if (!input.read(reinterpret_cast<char*>(&size), sizeof(size))) {

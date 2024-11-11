@@ -53,7 +53,7 @@ vector<tutorial::AddressBook> ParseMultipleDelimitedMessages(istream& input) {
   vector<tutorial::AddressBook> messages;
   tutorial::AddressBook message;
 
-  while (ParseDelimitedMessage(message, input)) {
+  while (ParseDelimitedMessage<tutorial::AddressBook>(message, input)) {
     messages.push_back(message);
   }
 

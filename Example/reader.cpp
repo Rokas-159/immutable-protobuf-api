@@ -38,7 +38,7 @@ void ListPeople(const tutorial::AddressBook& address_book) {
 void ParseMultipleDelimitedMessages(istream& input) {
   tutorial::AddressBook message;
 
-  for (int i = 0; ParseDelimitedMessage(message, input); i++) {
+  for (int i = 0; ParseDelimitedMessage<tutorial::AddressBook>(message, input); i++) {
     cout << "Message " << i << ":" << endl;
     ListPeople(message);
   }
