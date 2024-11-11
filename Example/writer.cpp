@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include "addressbook.pb.h"
+#include "message_parser.h"
+
 using namespace std;
 
 // This function fills in a Person message based on user input.
@@ -48,6 +50,40 @@ void PromptForAddress(tutorial::Person* person) {
   }
 }
 
+vector<tutorial::AddressBook> ParseMultipleDelimitedMessages(istream& input) {
+  vector<tutorial::AddressBook> messages;
+  tutorial::AddressBook message;
+
+  while (ParseDelimitedMessage<tutorial::AddressBook>(message, input)) {
+    messages.push_back(message);
+  }
+
+  return messages;
+}
+
+bool WriteDelimitedMessage(const tutorial::AddressBook& message, ostream& output) {
+  string serialized;
+  if (!message.SerializeToString(&serialized)) {
+    return false;
+  }
+
+  uint64_t size = serialized.size();
+
+  for (int i = 7; i >= 0; i--) {
+    char byte = (size >> i*8) & 0xFF;
+    output.put(byte);
+  }
+
+  output.write(serialized.data(), serialized.size());
+  return output.good();
+}
+
+void WriteMultipleDelimitedMessages(const vector<tutorial::AddressBook>& messages, ostream& output) {
+  for (const tutorial::AddressBook& message : messages) {
+    WriteDelimitedMessage(message, output);
+  }
+}
+
 // Main function:  Reads the entire address book from a file,
 //   adds one person based on user input, then writes it back out to the same
 //   file.
@@ -61,29 +97,41 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  tutorial::AddressBook address_book;
+  vector<tutorial::AddressBook> messages;
+  uint64_t message_index;
 
   {
     // Read the existing address book.
     fstream input(argv[1], ios::in | ios::binary);
     if (!input) {
       cout << argv[1] << ": File not found.  Creating a new file." << endl;
-    } else if (!address_book.ParseFromIstream(&input)) {
-      cerr << "Failed to parse address book." << endl;
+    }
+
+    messages = ParseMultipleDelimitedMessages(input);
+
+    cout << "Found " << messages.size() << " messages. Select which one to modify (" << messages.size() << " to append a new one): ";
+    cout.flush();
+    cin >> message_index;
+
+    if (message_index < 0 || message_index > static_cast<int>(messages.size())) {
+      cerr << "Message index out of bounds." << endl;
       return -1;
+    } else if (message_index == static_cast<int>(messages.size())) {
+      messages.emplace_back();
+      cout << "Modifying a newly appended message at index " << message_index << "." << endl;
+    } else {
+      cout << "Modifying message at index " << message_index << "." << endl;
     }
   }
 
   // Add an address.
-  PromptForAddress(address_book.add_people());
+  PromptForAddress(messages[message_index].add_people());
 
   {
     // Write the new address book back to disk.
     fstream output(argv[1], ios::out | ios::trunc | ios::binary);
-    if (!address_book.SerializeToOstream(&output)) {
-      cerr << "Failed to write address book." << endl;
-      return -1;
-    }
+    
+    WriteMultipleDelimitedMessages(messages, output);
   }
 
   // Optional:  Delete all global objects allocated by libprotobuf.
