@@ -5,10 +5,15 @@
 
 template <typename T>
 bool ParseDelimitedMessage(T& message, std::istream& input) {
-  uint64_t size;
-  
-  if (!input.read(reinterpret_cast<char*>(&size), sizeof(size))) {
-    return false;
+  uint64_t size = 0;
+
+  for (int i = 7; i >= 0; i--) {
+    char byte;
+    if (!input.get(byte)) {
+      return false;
+    }
+
+    size |= (static_cast<uint8_t>(byte) << i*8);
   }
 
   std::string buffer(size, '\0');

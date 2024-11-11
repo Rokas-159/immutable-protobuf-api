@@ -67,7 +67,12 @@ bool WriteDelimitedMessage(const tutorial::AddressBook& message, ostream& output
   }
 
   uint64_t size = serialized.size();
-  output.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+  for (int i = 7; i >= 0; i--) {
+    char byte = (size >> i*8) & 0xFF;
+    output.put(byte);
+  }
+
   output.write(serialized.data(), serialized.size());
   return output.good();
 }
