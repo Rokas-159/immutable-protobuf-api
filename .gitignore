@@ -8,6 +8,9 @@
 # Unignore makefile
 !makefile
 
+# Unignnore Bazel build files
+!BUILD
+
 # Ignore VSCode config
 .vscode
 
@@ -20,3 +23,5 @@
 # Ignore generated protobuf files
 *.pb.cc
 *.pb.h
+*.mypb.cc
+*.mypb.h
