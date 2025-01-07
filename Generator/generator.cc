@@ -26,6 +26,7 @@ std::string CppType(const google::protobuf::FieldDescriptor* field) {
 void GenerateIncludes(std::ostream& out) {
     out << "#include <string>\n";
     out << "#include <memory>\n";
+    out << "#include <vector>\n";
     out << "\n";
 }
 
@@ -33,21 +34,55 @@ void GenerateStruct(const google::protobuf::Descriptor* file_descriptor, std::os
     out << "struct " << file_descriptor->name() << "Internal {\n";
     for (int i = 0; i < file_descriptor->field_count(); i++) {
         const google::protobuf::FieldDescriptor* field = file_descriptor->field(i);
-        out << "\t" << CppType(field) << " " << field->name() << ";\n";
+        if (field->is_repeated()) {
+            out << "\tstd::vector<" << CppType(field) << "> " << field->name() << ";\n";
+        } else {
+            out << "\t" << CppType(field) << " " << field->name() << ";\n";
+        }
     }
     out << "};\n\n";
 }
 
-void GenerateSetter(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
-    out << "void set_" << field->name() << "(" << CppType(field) << " value) { ";
-    out << "data->" << field->name() << " = value; ";
+void GenerateRepeatedSize(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
+    out << "size_t " << field->name() << "_size() { ";
+    out << "return data->" << field->name() << ".size(); ";
     out << "}\n";
 }
 
-void GenerateGetter(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
-    out << CppType(field) << " get_" << field->name() << "() { ";
-    out << "return data->" << field->name() << "; ";
+void GenenerateRepeatedAdder(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
+    out << "void add_" << field->name() << "(" << CppType(field) << " value) { ";
+    out << "data->" << field->name() << ".push_back(value); ";
     out << "}\n";
+}
+
+void GenerateRepeatedEraser(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
+    out << "void erase_" << field->name() << "(size_t index) { ";
+    out << "data->" << field->name() << ".erase(data->" << field->name() << ".begin() + index); ";
+    out << "}\n";
+}
+
+void GenerateSetter(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
+    if (field->is_repeated()) {
+        out << "void update_" << field->name() << "(size_t index, " << CppType(field) << " value) { ";
+        out << "data->" << field->name() << "[index] = value; ";
+        out << "}\n";
+    } else {
+        out << "void set_" << field->name() << "(" << CppType(field) << " value) { ";
+        out << "data->" << field->name() << " = value; ";
+        out << "}\n";
+    }
+}
+
+void GenerateGetter(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
+    if (field->is_repeated()) {
+        out << CppType(field) << " get_" << field->name() << "(size_t index) { ";
+        out << "return data->" << field->name() << "[index]; ";
+        out << "}\n";
+    } else {
+        out << CppType(field) << " get_" << field->name() << "() { ";
+        out << "return data->" << field->name() << "; ";
+        out << "}\n";
+    }
 }
 
 void GenerateBuilder(const google::protobuf::Descriptor* file_descriptor, std::ostream& out) {
@@ -60,6 +95,10 @@ void GenerateBuilder(const google::protobuf::Descriptor* file_descriptor, std::o
     for (int i = 0; i < file_descriptor->field_count(); i++) {
         const google::protobuf::FieldDescriptor* field = file_descriptor->field(i);
         out << "\t\t"; GenerateSetter(field, out);
+        if (field->is_repeated()) {
+            out << "\t\t"; GenenerateRepeatedAdder(field, out);
+            out << "\t\t"; GenerateRepeatedEraser(field, out);
+        }
     }
 
     out << "\n";
@@ -67,6 +106,9 @@ void GenerateBuilder(const google::protobuf::Descriptor* file_descriptor, std::o
     for (int i = 0; i < file_descriptor->field_count(); i++) {
         const google::protobuf::FieldDescriptor* field = file_descriptor->field(i);
         out << "\t\t"; GenerateGetter(field, out);
+        if (field->is_repeated()) {
+            out << "\t\t"; GenerateRepeatedSize(field, out);
+        }
     }
 
     out << "\n";
@@ -86,6 +128,9 @@ void GenerateClass(const google::protobuf::Descriptor* file_descriptor, std::ost
     for (int i = 0; i < file_descriptor->field_count(); i++) {
         const google::protobuf::FieldDescriptor* field = file_descriptor->field(i);
         out << "\t"; GenerateGetter(field, out);
+        if (field->is_repeated()) {
+            out << "\t"; GenerateRepeatedSize(field, out);
+        }
     }
 
     out << "\n";
