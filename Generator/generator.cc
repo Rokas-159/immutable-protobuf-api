@@ -18,6 +18,8 @@ std::string CppType(const google::protobuf::FieldDescriptor* field) {
             return "double";
         case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
             return "bool";
+        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+            return field->message_type()->name();
         default:
             std::abort();
     }
@@ -147,7 +149,6 @@ void GenerateClass(const google::protobuf::Descriptor* file_descriptor, std::ost
 }
 
 void GenerateHeader(const google::protobuf::Descriptor* descriptor, std::ostream& out) {
-    GenerateIncludes(out);
     GenerateStruct(descriptor, out);
     GenerateClass(descriptor, out);
 }
@@ -176,6 +177,7 @@ int main(int argc, char* argv[]) {
     std::string input = argv[1];
     std::ofstream out(input.substr(0, input.size() - 6) + ".mypb.h");
 
+    GenerateIncludes(out);
     for (int i = 0; i < file_descriptor->message_type_count(); i++) {
         const google::protobuf::Descriptor* descriptor = file_descriptor->message_type(i);
         GenerateHeader(descriptor, out);
