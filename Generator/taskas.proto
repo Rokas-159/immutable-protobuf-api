@@ -5,5 +5,5 @@ message Taskas {
 	optional int64 y = 2;
 	optional int64 z = 3;
 	optional string name = 4;
-	repeated int64 test = 5;
+	repeated int64 numbers = 5;
 }

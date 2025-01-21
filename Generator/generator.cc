@@ -113,6 +113,10 @@ void GenerateBuilder(const google::protobuf::Descriptor* file_descriptor, std::o
 
     out << "\n";
 
+    out << "\t\t" << file_descriptor->name() << " Build() && { return " << file_descriptor->name() << "(std::move(data)); }\n";
+
+    out << "\n";
+
     out << "\t\tprivate:\n";
     out << "\t\tstd::unique_ptr<" << file_descriptor->name() << "Internal> data;\n";
     out << "\t};\n";
