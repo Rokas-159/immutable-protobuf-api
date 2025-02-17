@@ -25,6 +25,10 @@ std::string CppType(const google::protobuf::FieldDescriptor* field) {
     }
 }
 
+bool IsMutable(const google::protobuf::FieldDescriptor* field) {
+    return field->cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING || field->cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE;
+}
+
 void GenerateIncludes(std::ostream& out) {
     out << "#include <string>\n";
     out << "#include <memory>\n";
@@ -63,9 +67,21 @@ void GenerateRepeatedEraser(const google::protobuf::FieldDescriptor* field, std:
     out << "}\n";
 }
 
+void GenerateMutable(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
+    if (field->is_repeated()) {
+        out << CppType(field) << "* mutable_" << field->name() << "(size_t index) { ";
+        out << "return &data->" << field->name() << "[index]; ";
+        out << "}\n";
+    } else {
+        out << CppType(field) << "* mutable_" << field->name() << "() { ";
+        out << "return &data->" << field->name() << "; ";
+        out << "}\n";
+    }
+}
+
 void GenerateSetter(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
     if (field->is_repeated()) {
-        out << "void update_" << field->name() << "(size_t index, " << CppType(field) << " value) { ";
+        out << "void set_" << field->name() << "(size_t index, " << CppType(field) << " value) { ";
         out << "data->" << field->name() << "[index] = value; ";
         out << "}\n";
     } else {
@@ -97,10 +113,14 @@ void GenerateBuilder(const google::protobuf::Descriptor* file_descriptor, std::o
     for (int i = 0; i < file_descriptor->field_count(); i++) {
         const google::protobuf::FieldDescriptor* field = file_descriptor->field(i);
         out << "\t\t"; GenerateSetter(field, out);
+        if (IsMutable(field)) {
+            out << "\t\t"; GenerateMutable(field, out);
+        }
         if (field->is_repeated()) {
             out << "\t\t"; GenenerateRepeatedAdder(field, out);
             out << "\t\t"; GenerateRepeatedEraser(field, out);
         }
+        out << "\n";
     }
 
     out << "\n";
