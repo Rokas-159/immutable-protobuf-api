@@ -50,7 +50,7 @@ void GenerateStruct(const google::protobuf::Descriptor* file_descriptor, std::os
 }
 
 void GenerateRepeatedSize(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
-    out << "size_t " << field->name() << "_size() { ";
+    out << "size_t " << field->name() << "_size() const { ";
     out << "return data->" << field->name() << ".size(); ";
     out << "}\n";
 }
@@ -93,11 +93,11 @@ void GenerateSetter(const google::protobuf::FieldDescriptor* field, std::ostream
 
 void GenerateGetter(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
     if (field->is_repeated()) {
-        out << CppType(field) << " get_" << field->name() << "(size_t index) { ";
+        out << CppType(field) << " get_" << field->name() << "(size_t index) const { ";
         out << "return data->" << field->name() << "[index]; ";
         out << "}\n";
     } else {
-        out << CppType(field) << " get_" << field->name() << "() { ";
+        out << CppType(field) << " get_" << field->name() << "() const { ";
         out << "return data->" << field->name() << "; ";
         out << "}\n";
     }
