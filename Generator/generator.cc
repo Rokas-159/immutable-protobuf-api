@@ -174,15 +174,17 @@ void GenerateHeader(const google::protobuf::Descriptor* descriptor, std::ostream
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <proto_file>" << std::endl;
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <proto_file> <output_file>" << std::endl;
         return 1;
     }
 
     std::string src_file = argv[1];
+    std::string dst_file = argv[2];
 
     google::protobuf::compiler::DiskSourceTree source_tree;
-    source_tree.MapPath("/", "/");
+    const char* current_dir = getenv("PWD");
+    source_tree.MapPath("", current_dir ? current_dir : "/");
 
     google::protobuf::compiler::Importer importer(&source_tree, nullptr);
     const google::protobuf::FileDescriptor* file_descriptor = importer.Import(src_file);
@@ -195,7 +197,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Successfully parsed .proto file: " << src_file << std::endl;
 
     std::string input = argv[1];
-    std::ofstream out(input.substr(0, input.size() - 6) + ".mypb.h");
+    std::ofstream out(dst_file);
 
     GenerateIncludes(out);
     for (int i = 0; i < file_descriptor->message_type_count(); i++) {

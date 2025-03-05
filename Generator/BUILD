@@ -6,4 +6,5 @@ cc_binary(
 		"@protobuf//src/google/protobuf/compiler:importer",
         "@abseil-cpp//absl/strings",
     ],
+    visibility=["//visibility:public"],
 )

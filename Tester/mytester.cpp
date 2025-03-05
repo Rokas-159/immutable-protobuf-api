@@ -1,6 +1,6 @@
 #include <iostream>
 #include <benchmark/benchmark.h>
-#include "graph.mypb.h"
+#include "Tester/graph.mypb.h"
 
 void printGraph(const Graph& graph) {
     for (int i = 0; i < graph.nodes_size(); i++) {
