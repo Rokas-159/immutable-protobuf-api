@@ -19,7 +19,7 @@ std::string CppType(const google::protobuf::FieldDescriptor* field) {
         case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
             return "bool";
         case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-            return field->message_type()->name();
+            return std::string(field->message_type()->name());
         default:
             std::abort();
     }

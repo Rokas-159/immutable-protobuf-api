@@ -25,3 +25,5 @@
 *.pb.h
 *.mypb.cc
 *.mypb.h
+
+*.MODULE.bazel.lock
