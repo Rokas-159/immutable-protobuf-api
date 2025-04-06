@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+message Node {
+    optional int64 id = 1;
+    optional int64 value = 2;
+    repeated int64 adj = 3;
+}
+
+message Graph {
+    repeated Node nodes = 1;
+}

@@ -19,7 +19,7 @@ std::string CppType(const google::protobuf::FieldDescriptor* field) {
         case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
             return "bool";
         case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-            return field->message_type()->name();
+            return std::string(field->message_type()->name());
         default:
             std::abort();
     }
@@ -50,7 +50,7 @@ void GenerateStruct(const google::protobuf::Descriptor* file_descriptor, std::os
 }
 
 void GenerateRepeatedSize(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
-    out << "size_t " << field->name() << "_size() { ";
+    out << "size_t " << field->name() << "_size() const { ";
     out << "return data->" << field->name() << ".size(); ";
     out << "}\n";
 }
@@ -93,11 +93,11 @@ void GenerateSetter(const google::protobuf::FieldDescriptor* field, std::ostream
 
 void GenerateGetter(const google::protobuf::FieldDescriptor* field, std::ostream& out) {
     if (field->is_repeated()) {
-        out << CppType(field) << " get_" << field->name() << "(size_t index) { ";
+        out << CppType(field) << " get_" << field->name() << "(size_t index) const { ";
         out << "return data->" << field->name() << "[index]; ";
         out << "}\n";
     } else {
-        out << CppType(field) << " get_" << field->name() << "() { ";
+        out << CppType(field) << " get_" << field->name() << "() const { ";
         out << "return data->" << field->name() << "; ";
         out << "}\n";
     }
@@ -174,15 +174,17 @@ void GenerateHeader(const google::protobuf::Descriptor* descriptor, std::ostream
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <proto_file>" << std::endl;
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <proto_file> <output_file>" << std::endl;
         return 1;
     }
 
     std::string src_file = argv[1];
+    std::string dst_file = argv[2];
 
     google::protobuf::compiler::DiskSourceTree source_tree;
-    source_tree.MapPath("/", "/");
+    const char* current_dir = getenv("PWD");
+    source_tree.MapPath("", current_dir ? current_dir : "/");
 
     google::protobuf::compiler::Importer importer(&source_tree, nullptr);
     const google::protobuf::FileDescriptor* file_descriptor = importer.Import(src_file);
@@ -195,7 +197,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Successfully parsed .proto file: " << src_file << std::endl;
 
     std::string input = argv[1];
-    std::ofstream out(input.substr(0, input.size() - 6) + ".mypb.h");
+    std::ofstream out(dst_file);
 
     GenerateIncludes(out);
     for (int i = 0; i < file_descriptor->message_type_count(); i++) {

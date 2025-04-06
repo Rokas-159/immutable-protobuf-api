@@ -1,0 +1,13 @@
+diff --git a/src/google/protobuf/BUILD.bazel b/src/google/protobuf/BUILD.bazel
+index e35af5b9d..ab9de3f30 100644
+--- a/src/google/protobuf/BUILD.bazel
++++ b/src/google/protobuf/BUILD.bazel
+@@ -646,7 +646,7 @@ cc_library(
+     linkopts = LINK_OPTS,
+     strip_include_prefix = "/src",
+     visibility = [
+-        "//:__subpackages__",
++        "//visibility:public",
+     ],
+     deps = [
+         ":internal_visibility",
