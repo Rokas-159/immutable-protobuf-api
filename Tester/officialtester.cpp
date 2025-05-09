@@ -15,6 +15,10 @@ void printGraph(Graph& graph) {
 
 class GraphTester {
 private:
+    Graph graph;
+    int root;
+    bool built = false;
+
     long long sumDFS(const Graph& graph, const Node& v, const long long MOD) {
         long long sum = v.value() % MOD;
 
@@ -41,10 +45,14 @@ private:
         return index;
     }
 public:
-    void binaryGraphTest(int size, int copies) {
-        Graph graph;
+    void binaryGraphTestBuild(int size) {
+        root = buildBinaryNode(1, size, graph);
 
-        int root = buildBinaryNode(1, size, graph);
+        built = true;
+    }
+
+    void binaryGraphTestBFS() {
+        assert(built);
 
         long long sum = sumDFS(graph, graph.nodes(root), 1e9+7);
 
@@ -52,17 +60,22 @@ public:
     }
 };
 
-static void test() {
-    GraphTester tester;
-    tester.binaryGraphTest(1000000, 0);
-}
+GraphTester tester;
 
-static void OFFICIAL_PB(benchmark::State& state) {
+static void OFFICIAL_PB_BUILD(benchmark::State& state) {
     for (auto _ : state) {
-        test();
+        tester.binaryGraphTestBuild(1000000);
     }
 }
 
-BENCHMARK(OFFICIAL_PB);
+static void OFFICIAL_PB_BFS(benchmark::State& state) {
+    for (auto _ : state) {
+        tester.binaryGraphTestBFS();
+    }
+}
+
+BENCHMARK(OFFICIAL_PB_BUILD);
+
+BENCHMARK(OFFICIAL_PB_BFS);
 
 BENCHMARK_MAIN();
