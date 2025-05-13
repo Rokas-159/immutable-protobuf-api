@@ -60,15 +60,18 @@ public:
     }
 };
 
-GraphTester tester;
+
 
 static void OFFICIAL_PB_BUILD(benchmark::State& state) {
     for (auto _ : state) {
+        GraphTester tester;
         tester.binaryGraphTestBuild(1000000);
     }
 }
 
 static void OFFICIAL_PB_BFS(benchmark::State& state) {
+    GraphTester tester;
+    tester.binaryGraphTestBuild(1000000);
     for (auto _ : state) {
         tester.binaryGraphTestBFS();
     }
