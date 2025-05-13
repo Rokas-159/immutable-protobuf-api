@@ -36,6 +36,13 @@ void GenerateIncludes(std::ostream& out) {
     out << "\n";
 }
 
+void GenerateClassDeclarations(std::ostream& out, const google::protobuf::FileDescriptor* file_descriptor) {
+    for (int i = 0; i < file_descriptor->message_type_count(); i++) {
+        out << "class " << file_descriptor->message_type(i)->name() << ";\n";
+    }
+    out << "\n";
+}
+
 void GenerateStruct(const google::protobuf::Descriptor* file_descriptor, std::ostream& out) {
     out << "struct " << file_descriptor->name() << "Internal {\n";
     for (int i = 0; i < file_descriptor->field_count(); i++) {
@@ -200,6 +207,7 @@ int main(int argc, char* argv[]) {
     std::ofstream out(dst_file);
 
     GenerateIncludes(out);
+    GenerateClassDeclarations(out, file_descriptor);
     for (int i = 0; i < file_descriptor->message_type_count(); i++) {
         const google::protobuf::Descriptor* descriptor = file_descriptor->message_type(i);
         GenerateHeader(descriptor, out);

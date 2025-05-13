@@ -9,3 +9,9 @@ message Node {
 message Graph {
     repeated Node nodes = 1;
 }
+
+message Medis {
+    optional int64 id = 1;
+    optional int64 value = 2;
+    repeated Medis children = 3;
+}
