@@ -15,37 +15,70 @@ void printGraph(Graph& graph) {
 
 class GraphTester {
 private:
+    Graph graph;
+    int root;
+    bool built = false;
+
+    long long sumDFS(const Graph& graph, const Node& v, const long long MOD) {
+        long long sum = v.value() % MOD;
+
+        for (int i = 0; i < v.adj_size(); i++) {
+            sum += sumDFS(graph, graph.nodes(v.adj(i)), MOD);
+            sum %= MOD;
+        }
+
+        return sum;
+    }
+
     int buildBinaryNode(int v, int n, Graph& graph) {
+        int index = graph.nodes_size();
+
         Node* node = graph.add_nodes();
         node->set_id(v);
-        node->set_value(0);
+        node->set_value(v);
 
         if (v < n) {
             node->add_adj(buildBinaryNode(2*v, n, graph));
             node->add_adj(buildBinaryNode(2*v+1, n, graph));
         }
 
-        return graph.nodes_size();
+        return index;
     }
 public:
-    void binaryGraphTest(int size, int copies) {
-        Graph graph;
+    void binaryGraphTestBuild(int size) {
+        root = buildBinaryNode(1, size, graph);
 
-        buildBinaryNode(1, size, graph);
+        built = true;
+    }
+
+    void binaryGraphTestBFS() {
+        assert(built);
+
+        long long sum = sumDFS(graph, graph.nodes(root), 1e9+7);
+
+        //std::cout << sum << std::endl;
     }
 };
 
-static void test() {
-    GraphTester tester;
-    tester.binaryGraphTest(1000000, 0);
-}
 
-static void BM_test(benchmark::State& state) {
+
+static void OFFICIAL_PB_BUILD(benchmark::State& state) {
     for (auto _ : state) {
-        test();
+        GraphTester tester;
+        tester.binaryGraphTestBuild(1000000);
     }
 }
 
-BENCHMARK(BM_test);
+static void OFFICIAL_PB_BFS(benchmark::State& state) {
+    GraphTester tester;
+    tester.binaryGraphTestBuild(1000000);
+    for (auto _ : state) {
+        tester.binaryGraphTestBFS();
+    }
+}
+
+BENCHMARK(OFFICIAL_PB_BUILD);
+
+BENCHMARK(OFFICIAL_PB_BFS);
 
 BENCHMARK_MAIN();
